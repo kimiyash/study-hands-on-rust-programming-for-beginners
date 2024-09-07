@@ -42,4 +42,11 @@ fn main() {
     duck.tweet_twice();
     println!("----");
     dove.shout();
+
+    println!("");
+
+    let bird_vec: Vec<Box<dyn Tweet>> = vec![Box::new(dove), Box::new(duck)];
+    for bird in bird_vec {
+        bird.tweet();
+    }
 }
