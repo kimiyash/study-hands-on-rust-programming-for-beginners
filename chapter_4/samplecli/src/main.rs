@@ -47,6 +47,15 @@ impl RpnCalcurator {
     }
 }
 
+fn run<R: BufRead>(reader: R, verbose: bool) {
+    let calc = RpnCalcurator::new(verbose);
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let answer = calc.eval(&line);
+        println!("{}", answer);
+    }
+}
+
 fn main() {
     let matches = App::new("My RPN program")
         .version("1.0.0")
@@ -78,13 +87,4 @@ fn main() {
         run(reader, verbose);
     }
 
-}
-
-fn run<R: BufRead>(reader: R, verbose: bool) {
-    let calc = RpnCalcurator::new(verbose);
-    for line in reader.lines() {
-        let line = line.unwrap();
-        let answer = calc.eval(&line);
-        println!("{}", answer);
-    }
 }
