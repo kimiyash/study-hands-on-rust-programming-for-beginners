@@ -25,6 +25,14 @@ impl Tweet for Dove {
     }
 }
 
+struct Dropable;
+
+impl Drop for Dropable {
+    fn drop(&mut self) {
+        println!("Resource will be released!");
+    }
+}
+
 fn main() {
     let dove = Dove;
     let duck = Duck;
@@ -49,4 +57,10 @@ fn main() {
     for bird in bird_vec {
         bird.tweet();
     }
+
+    println!("");
+    {
+        let _dropable = Dropable;        
+    }
+    println!("dropped")
 }
