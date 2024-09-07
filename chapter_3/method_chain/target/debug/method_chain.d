@@ -1,1 +1,0 @@
-/Users/kimiyash/dev/study/study-hands-on-rust-programming-for-beginners/method_chain/target/debug/method_chain: /Users/kimiyash/dev/study/study-hands-on-rust-programming-for-beginners/method_chain/src/main.rs
