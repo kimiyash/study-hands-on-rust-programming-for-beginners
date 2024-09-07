@@ -11,6 +11,7 @@ fn main() {
     let data = Arc::new(Mutex::new(vec![1; 10]));
 
     for x in 0..10 {
+        // 下記行は Rc を導入したときから追加
         let data_ref = data.clone(); // Vec をクローンではなく Arc<Mutex<Vec<i32>>> をクローンしている
         handles.push(thread::spawn(move || {
             let mut data = data_ref.lock().unwrap();
