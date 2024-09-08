@@ -1,6 +1,10 @@
+use anyhow::{bail, ensure, Context, Result};
+
 use clap::{App, Arg};
 use std::fs::File;
 use std::io::{stdin, BufRead, BufReader};
+use std::path::PathBuf;
+use std::str::FromStr;
 
 struct RpnCalcurator(bool);
 
@@ -9,20 +13,23 @@ impl RpnCalcurator {
         Self(verbose)
     }
 
-    pub fn eval(&self, formula: &str) -> i32 {
+    pub fn eval(&self, formula: &str) -> Result<i32> {
         let mut tokens = formula.split_whitespace().rev().collect::<Vec<_>>();
         self.eval_inner(&mut tokens)
     }
 
-    fn eval_inner(&self, tokens: &mut Vec<&str>) -> i32 {
+    fn eval_inner(&self, tokens: &mut Vec<&str>) -> Result<i32> {
         let mut stack = Vec::new();
+        let mut pos = 0;
 
         while let Some(token) = tokens.pop() {
+            pos += 1;
+
             if let Ok(x) = token.parse::<i32>() {
                 stack.push(x);
             } else {
-                let y = stack.pop().expect("invalid syntax");
-                let x = stack.pop().expect("invalid syntax");
+                let y = stack.pop().context(format!("invalid syntax as {}", pos))?;
+                let x = stack.pop().context(format!("invalid syntax as {}", pos))?;
 
                 let res = match token {
                     "+" => x + y,
@@ -30,7 +37,7 @@ impl RpnCalcurator {
                     "*" => x * y,
                     "/" => x / y,
                     "%" => x % y,
-                    _ => panic!("invalid token"),
+                    _ => bail!("invalid token at {}", pos),
                 };
                 stack.push(res);
             }
@@ -39,24 +46,32 @@ impl RpnCalcurator {
                 println!("{:?} {:?}", tokens, stack);
             }
         }
-        if stack.len() == 1 {
-            stack[0]
-        } else {
-            panic!("invalid syntax")
+
+        if self.0 {
+            println!("{:?} {:?}", tokens, stack)
+        }
+
+        ensure!(stack.len() == 1, "invalid syntax");
+
+        Ok(stack[0])
+    }
+}
+
+fn run<R: BufRead>(reader: R, verbose: bool) -> Result<()>{
+    let calc = RpnCalcurator::new(verbose);
+
+    for line in reader.lines() {
+        let line = line?;
+        match calc.eval(&line) {
+            Ok(answer) => println!("{}", answer),
+            Err(e) => eprint!("{:#?}", e),
         }
     }
+
+    Ok(())
 }
 
-fn run<R: BufRead>(reader: R, verbose: bool) {
-    let calc = RpnCalcurator::new(verbose);
-    for line in reader.lines() {
-        let line = line.unwrap();
-        let answer = calc.eval(&line);
-        println!("{}", answer);
-    }
-}
-
-fn main() {
+fn main() -> Result<()> {
     let matches = App::new("My RPN program")
         .version("1.0.0")
         .author("kimiyash")
@@ -77,14 +92,14 @@ fn main() {
 
     let verbose = matches.is_present("verbose");
 
-    if let Some(path) = matches.value_of("formula_file") {
-        let f = File::open(path).unwrap();
+    if let Ok(path) = PathBuf::from_str(matches.value_of("formula_file").unwrap()) {
+        let f = File::open(path)?;
         let reader = BufReader::new(f);
-        run(reader, verbose);
+        run(reader, verbose)
     } else {
         let stdin = stdin();
         let reader = stdin.lock();
-        run(reader, verbose);
+        run(reader, verbose)
     }
 
 }
@@ -96,21 +111,23 @@ mod tests {
     #[test]
     fn test_ok() {
         let calc = RpnCalcurator::new(false);
-        assert_eq!(calc.eval("5"), 5);
-        assert_eq!(calc.eval("50"), 50);
-        assert_eq!(calc.eval("-50"), -50);
+        assert_eq!(calc.eval("5").unwrap(), 5);
+        assert_eq!(calc.eval("50").unwrap(), 50);
+        assert_eq!(calc.eval("-50").unwrap(), -50);
 
-        assert_eq!(calc.eval("2 3 +"), 5);
-        assert_eq!(calc.eval("2 3 *"), 6);
-        assert_eq!(calc.eval("2 3 -"), -1);
-        assert_eq!(calc.eval("2 3 /"), 0);
-        assert_eq!(calc.eval("2 3 %"), 2);
+        assert_eq!(calc.eval("2 3 +").unwrap(), 5);
+        assert_eq!(calc.eval("2 3 *").unwrap(), 6);
+        assert_eq!(calc.eval("2 3 -").unwrap(), -1);
+        assert_eq!(calc.eval("2 3 /").unwrap(), 0);
+        assert_eq!(calc.eval("2 3 %").unwrap(), 2);
     }
 
     #[test]
-    #[should_panic]
     fn test_ng() {
         let calc = RpnCalcurator::new(false);
-        calc.eval("1 1 ^");
+        assert!(calc.eval("").is_err());
+        assert!(calc.eval("1 1 ^").is_err());
+        assert!(calc.eval("1 1 1 +").is_err());
+        assert!(calc.eval("+ 1 1").is_err());
     }
 }
