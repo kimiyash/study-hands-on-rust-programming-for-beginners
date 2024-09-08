@@ -34,7 +34,7 @@ fn get_int_from_file() -> Result<i32, MyError> {
         .trim()
         .parse::<i32>()
         .map(|t| t * 2)
-        .map_err(MyError::from)
+        .map_err(|e| MyError::Num(e))
 }
 
 fn main() {
