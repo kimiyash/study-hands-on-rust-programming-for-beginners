@@ -10,6 +10,6 @@ COPY ./templates ./templates
 RUN rm -f target/release/deps/todo*
 RUN cargo build --release
 
-FROM rust:1.80
+FROM debian:latest
 COPY --from=builder /todo/target/release/todo /usr/local/bin/todo
 CMD ["todo"]
