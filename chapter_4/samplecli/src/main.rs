@@ -57,14 +57,14 @@ impl RpnCalcurator {
     }
 }
 
-fn run<R: BufRead>(reader: R, verbose: bool) -> Result<()>{
+fn run<R: BufRead>(reader: R, verbose: bool) -> Result<()> {
     let calc = RpnCalcurator::new(verbose);
 
     for line in reader.lines() {
         let line = line?;
         match calc.eval(&line) {
             Ok(answer) => println!("{}", answer),
-            Err(e) => eprint!("{:#?}", e),
+            Err(e) => eprintln!("{:#?}", e),
         }
     }
 
