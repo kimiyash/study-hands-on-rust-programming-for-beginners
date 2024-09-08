@@ -1,21 +1,23 @@
-use anyhow::{bail, ensure, Context, Result};
+use thiserror::Error;
 
-fn get_int_from_file() -> Result<i32> {
+#[derive(Error, Debug)]
+enum MyError {
+    #[error("faild to read string from {0}")]
+    ReadError(String),
+    #[error(transparent)]
+    ParseError(#[from] std::num::ParseIntError),
+}
+
+fn get_int_from_file() -> Result<i32, MyError> {
     let path = "number.txt";
 
-    let num_str = std::fs::read_to_string(path)
-        .with_context(|| format!("failed to read string from {}", path))?;
-
-    if num_str.len() >= 10 {
-        bail!("it may be too large number");
-    }
-    ensure!(num_str.starts_with("1"), "first digit is not 1");
+    let num_str = std::fs::read_to_string(path).map_err(|_| MyError::ReadError(path.into()))?;
 
     num_str
         .trim()
         .parse::<i32>()
         .map(|t| t * 2)
-        .context("faiild to parse string")
+        .map_err(MyError::from)
 }
 
 fn main() {
