@@ -102,7 +102,6 @@ fn main() -> Result<()> {
         let reader = stdin.lock();
         run(reader, verbose)
     }
-
 }
 
 #[cfg(test)]
