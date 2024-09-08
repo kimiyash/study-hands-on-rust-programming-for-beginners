@@ -92,7 +92,8 @@ fn main() -> Result<()> {
 
     let verbose = matches.is_present("verbose");
 
-    if let Ok(path) = PathBuf::from_str(matches.value_of("formula_file").unwrap()) {
+    if let Some(path) = matches.value_of("formula_file") {
+        let path = PathBuf::from_str(path)?;
         let f = File::open(path)?;
         let reader = BufReader::new(f);
         run(reader, verbose)
