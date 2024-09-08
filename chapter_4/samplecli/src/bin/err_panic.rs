@@ -11,7 +11,8 @@ enum MyError {
 fn get_int_from_file() -> Result<i32, MyError> {
     let path = "number.txt";
 
-    let num_str = std::fs::read_to_string(path).map_err(|_| MyError::ReadError(path.into()))?;
+    let num_str = std::fs::read_to_string(path)
+        .map_err(|_| MyError::ReadError(path.into()))?;
 
     num_str
         .trim()
