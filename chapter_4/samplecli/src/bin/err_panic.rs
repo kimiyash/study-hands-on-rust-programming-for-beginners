@@ -1,34 +1,16 @@
-use core::fmt;
+use anyhow::{Context, Result};
 
-enum MyError {
-    Io(std::io::Error),
-    Num(std::num::ParseIntError),
-}
-
-impl From<std::io::Error> for MyError {
-    fn from(value: std::io::Error) -> Self {
-        Self::Io(value)
-    }
-}
-
-impl fmt::Display for MyError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            MyError::Io(cause) => write!(f, "I/O Error: {}", cause),
-            MyError::Num(cause) => write!(f, "Parse Error: {}", cause),
-        }
-    }
-}
-
-fn get_int_from_file() -> Result<i32, MyError> {
+fn get_int_from_file() -> Result<i32> {
     let path = "number.txt";
 
-    let num_str = std::fs::read_to_string(path).map_err(MyError::from)?;
+    let num_str = std::fs::read_to_string(path)
+        .with_context(|| format!("failed to read string from {}", path))?;
+
     num_str
         .trim()
         .parse::<i32>()
         .map(|t| t * 2)
-        .map_err(MyError::Num)
+        .context("faiild to parse string")
 }
 
 fn main() {
