@@ -11,12 +11,6 @@ impl From<std::io::Error> for MyError {
     }
 }
 
-impl From<std::num::ParseIntError> for MyError {
-    fn from(value: std::num::ParseIntError) -> Self {
-        Self::Num(value)
-    }
-}
-
 impl fmt::Display for MyError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -34,7 +28,7 @@ fn get_int_from_file() -> Result<i32, MyError> {
         .trim()
         .parse::<i32>()
         .map(|t| t * 2)
-        .map_err(|e| MyError::Num(e))
+        .map_err(MyError::Num)
 }
 
 fn main() {
