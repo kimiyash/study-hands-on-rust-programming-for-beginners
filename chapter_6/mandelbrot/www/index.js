@@ -41,6 +41,7 @@ const logic = {
     }
 }
 
+// wasm js hybrid と js native から利用される関数と変数
 function draw(ctx, canvas_w, canvas_h, data) {
     let img = new ImageData(new Uint8ClampedArray(data), canvas_w, canvas_h);
     ctx.putImageData(img, 0, 0);
@@ -61,8 +62,9 @@ Promise.all([mandelbrot]).then(async function ([
     console.log("finished loadiing wasm");
     const renderBtn = document.getElementById('render');
     renderBtn.addEventListener('click', () => {
-        draw_mandelbrot_set();
-        let wasmResult = null;
+        draw_mandelbrot_set(); // wasm native
+
+        let wasmResult = null; // wasm js hybrid
         {
             const CANVAS_ID = "canvas_hybrid";
             let canvas = document.getElementById(CANVAS_ID);
@@ -78,10 +80,11 @@ Promise.all([mandelbrot]).then(async function ([
             draw(context, canvasWidth, canvasHeight, wasmResult);
             const drawEndTime = Date.now();
             const elapsed = generateEndTime - generateStartTime;
-            console.log(`\tgenerate:wasm\tgenerate_elapsed:&(elapsed)[ms]`);
-            console.log(`\tdraw: js\draw_elapsed: $(drawEndTime - drawStartTime}[ms]`);
+            console.log(`\tgenerate:wasm\tgenerate_elapsed:${elapsed}[ms]`);
+            console.log(`\tdraw: js\draw_elapsed: ${drawEndTime - drawStartTime}[ms]`);
         }
-        let jsResult = null;
+
+        let jsResult = null; // js native
         {
             const CANVAS_ID = "canvas_js";
             let canvas = document.getElementById(CANVAS_ID);

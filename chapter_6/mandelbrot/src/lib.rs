@@ -32,7 +32,7 @@ macro_rules! measure_elapsed_time {
     }};
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen]  // wasm js hybrid から呼び出される
 pub fn generate_mandelbrot_set(
     canvas_w: usize,
     canvas_h: usize,
@@ -42,13 +42,13 @@ pub fn generate_mandelbrot_set(
     y_max: f64,
     max_iter: usize,
 ) -> Vec<u8> {
-    measure_elapsed_time!("genrage:wasm\telapsed:", {
+    measure_elapsed_time!("generate:wasm\telapsed:", {
         logic::generate_mandelbrot_set(canvas_w, canvas_h,
             x_min, x_max, y_min, y_max, max_iter)
     })
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen] // wasm native の用途で呼びされる
 pub fn draw_mandelbrot_set() {
     const CANVAS_ID: &str = "canvas_wasm";
     let document = web_sys::window().unwrap().document().unwrap();
