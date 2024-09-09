@@ -45,15 +45,15 @@ function draw(ctx, canvas_w, canvas_h, data) {
     let img = new ImageData(new Uint8ClampedArray(data), canvas_w, canvas_h);
     ctx.putImageData(img, 0, 0);
 }
- const X_MIN = -1.5;
- const X_MAX = 0.5;
- const Y_MIN = -1.0;
- const Y_MAX = 1.0;
- const MAX_ITER = 64;
+const X_MIN = -1.5;
+const X_MAX = 0.5;
+const Y_MIN = -1.0;
+const Y_MAX = 1.0;
+const MAX_ITER = 64;
 
- console.log("start loading wasm");
- const mandelbrot = import('../pkg')
-    .catch(console.error);
+console.log("start loading wasm");
+const mandelbrot = import('../pkg')
+.catch(console.error);
 
 Promise.all([mandelbrot]).then(async function ([
     { generate_mandelbrot_set, draw_mandelbrot_set }
