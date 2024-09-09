@@ -1,4 +1,4 @@
-use wasm_bindgen::prelude::+;
+use wasm_bindgen::prelude::*;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -55,7 +55,7 @@ pub fn solve(problem: Vec<u8>) -> Vec<u8> {
         // 行きがけの処理
         if !is_valid(result, p, v) {
             if v < 9 {
-                stack.push(((false, p, v + 1)));
+                stack.push((false, p, v + 1));
             } else {
                 is_failing = true;
             }
