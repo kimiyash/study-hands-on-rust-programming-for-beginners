@@ -1,0 +1,19 @@
+FROM ubuntu:20.04
+
+# 必要なライブラリのインストール
+RUN apt-get update && apt-get install -y curl \
+    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
+    && apt-get install -y nodejs \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    libxi6
+
+# xpmのインストール
+RUN npm install --global xpm@0.5.0
+
+# qemu-armのインストール
+RUN xpm install --global @xpack-dev-tools/qemu-arm@2.8.0-8.1
+
+RUN ln -s `find /root -name "qemu-system-gnuarmeclipse"` /usr/local/bin
