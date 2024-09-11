@@ -1,0 +1,13 @@
+[package]
+name = "sample"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+uuid = {version = "1.10.0", path = "../uuid"}
+mktemp = "0.4.0"
+
+[workspace]
+members = [
+    "main", "sub",
+]
